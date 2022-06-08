@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/SkyBlue"
+    tools:context=".StartActivity">
+
+    <Button
+        android:id="@+id/buttonStart"
+        android:layout_width="241dp"
+        android:layout_height="76dp"
+        android:background="@drawable/button"
+        android:text="New Game"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.11" />
+
+    <Button
+        android:id="@+id/buttonResume"
+        android:layout_width="241dp"
+        android:layout_height="76dp"
+        android:background="@drawable/button"
+        android:text="Resume"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.438" />
+
+    <SeekBar
+        android:id="@+id/seekBarMusic"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="228dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:max="10"
+        android:thumbTint="@color/Yellow"
+        android:progressTint="@color/Red"
+        android:progress="3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonResume"
+        app:layout_constraintVertical_bias="0.505" />
+
+    <TextView
+        android:id="@+id/textViewMusic"
+        android:layout_width="61dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="472dp"
+        android:text="Music"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/seekBarMusic"
+        app:layout_constraintEnd_toStartOf="@+id/textViewSoundEffect"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.945" />
+
+    <TextView
+        android:id="@+id/textViewSoundEffect"
+        android:layout_width="144dp"
+        android:layout_height="15dp"
+        android:layout_marginEnd="44dp"
+        android:text="Sound Effect"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/seekBarSoundEffect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.945" />
+
+    <SeekBar
+        android:id="@+id/seekBarSoundEffect"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="228dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="84dp"
+        android:max="10"
+        android:thumbTint="@color/Yellow"
+        android:progressTint="@color/Red"
+        android:progress="3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/seekBarMusic"
+        app:layout_constraintTop_toBottomOf="@+id/buttonResume"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ImageView
+        android:id="@+id/imageViewGround"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="132dp"
+        android:src="@drawable/ground_menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonResume" />
+
+    <TextView
+        android:id="@+id/textViewPowerBy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Powered by:\n\n  Massimiliano Russo\n\n  Gennaro Sorrentino"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/imageViewGround"
+        app:layout_constraintEnd_toStartOf="@+id/seekBarSoundEffect"
+        app:layout_constraintHorizontal_bias="0.437"
+        app:layout_constraintStart_toEndOf="@+id/seekBarMusic"
+        app:layout_constraintTop_toBottomOf="@+id/buttonResume"
+        app:layout_constraintVertical_bias="1.0" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
