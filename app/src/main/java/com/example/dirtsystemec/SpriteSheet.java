@@ -8,7 +8,7 @@ import android.graphics.RectF;
 public class SpriteSheet {
     private final Bitmap spriteSheet;
     private int spriteWidth, spriteHeight;
-    private final int[] delay;
+    protected final int[] delay;
     private final Rect src = new Rect();
     private final RectF dest = new RectF();
     private float screen_semi_width, screen_semi_height;
@@ -50,9 +50,6 @@ public class SpriteSheet {
     }
 
 
-    public int[] getDelay() {
-        return delay;
-    }
 
 
     public int getNumberOfAnimations() {

@@ -18,12 +18,4 @@ public abstract class Component {
     public abstract ComponentType type();
 
 
-    public Entity getOwner() {
-        return owner;
-    }
-
-
-    public void setOwner(Entity owner) {
-        this.owner = owner;
-    }
 }

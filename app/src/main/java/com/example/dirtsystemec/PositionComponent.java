@@ -17,13 +17,6 @@ public abstract class PositionComponent extends Component{
         }
 
 
-    public float getCoordinateX() {
-        return coordinateX;
-    }
-
-    public float getCoordinateY() {
-        return coordinateY;
-    }
 }
 
 class StaticPositionComponent extends PositionComponent{

@@ -31,8 +31,8 @@ public class ScoreBarSprite {
     public void draw(long currentTimeStamp){
         canvas.save();
         canvas.rotate(90, coordinate_x, coordinate_y);
-        if(currentTimeStamp-lastTimeStamp > spritesheet.getDelay()[currentAnimation]){
-            if(currentAnimation >= spritesheet.getDelay().length-1){
+        if(currentTimeStamp-lastTimeStamp > spritesheet.delay[currentAnimation]){
+            if(currentAnimation >= spritesheet.delay.length-1){
                 currentAnimation = 0;
             }else{
                 currentAnimation = currentAnimation+1;

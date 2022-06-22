@@ -43,7 +43,7 @@ public abstract class DrawableComponent  extends Component{
         float coordinate_x,coordinate_y,angle;
         GameWorld gameWorld;
         Box view;
-        List<Component> physicsComponents = (List<Component>) owner.getComponent(ComponentType.Physics);
+        List<Component> physicsComponents = (List<Component>) owner.components.get(ComponentType.Physics);
         PhysicsComponent physicsComponent = null;
 
         if(physicsComponents != null) {
@@ -67,11 +67,11 @@ public abstract class DrawableComponent  extends Component{
                 this.draw(buffer, screen_x, screen_y, angle);
             }
         } else {
-            Object component = owner.getComponent(ComponentType.Position).get(0);
+            Object component = owner.components.get(ComponentType.Position).get(0);
             if (component instanceof PositionComponent) {
                 PositionComponent positionComponent = (PositionComponent) component;
-                coordinate_x = positionComponent.getCoordinateX();
-                coordinate_y = positionComponent.getCoordinateY();
+                coordinate_x = positionComponent.coordinateX;
+                coordinate_y = positionComponent.coordinateY;
                 gameWorld = ((GameObject) owner).gameWorld;
                 view = gameWorld.currentView;
                 if (coordinate_x > view.xmin && coordinate_x < view.xmax &&
@@ -200,9 +200,7 @@ class TextDrawableComponent extends DrawableComponent{
     }
 
 
-    public void setText(String text){
-        this.text=text;
-    }
+
 
 }
 

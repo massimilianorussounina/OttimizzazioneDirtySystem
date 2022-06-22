@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DirtSystemEC</string>
+    <string name="app_name">DirtSystemECOE</string>
     <string name="DensityTriangle">0.5</string>
     <string name="title_activity_start">StartActivity</string>
     <!-- Strings used for fragments for navigation -->

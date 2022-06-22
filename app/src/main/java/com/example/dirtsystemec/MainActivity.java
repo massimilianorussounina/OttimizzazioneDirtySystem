@@ -138,7 +138,7 @@ public class MainActivity extends Activity {
 
         setContentView(renderView);
         MultiTouchHandler touchHandler = new MultiTouchHandler(renderView, 1, 1);
-        gw.setTouchHandler(touchHandler);
+        gw.touchHandler=touchHandler;
         MyThread myThread = new MyThread(gw);
         myThread.start();
 
@@ -153,7 +153,7 @@ public class MainActivity extends Activity {
         backgroundMusic.setVolume(volumeMusic);
         bulldozerMusic.play();
         backgroundMusic.play();
-        gw.setTimeResume(System.currentTimeMillis());
+        gw.timeResume=System.currentTimeMillis();
         renderView.resume();
     }
 
@@ -164,7 +164,7 @@ public class MainActivity extends Activity {
 
         bulldozerMusic.pause();
         backgroundMusic.pause();
-        gw.setTimerPause(System.currentTimeMillis());
+        gw.timerPause=System.currentTimeMillis();
         renderView.pause();
     }
 
@@ -206,7 +206,7 @@ public class MainActivity extends Activity {
         for(GameObject obj: gw.listBarrel){
             try {
 
-                barrelList.add(((PhysicsComponent)obj.getComponent(ComponentType.Physics).get(0)).body.getPositionY());
+                barrelList.add(((PhysicsComponent)obj.components.get(ComponentType.Physics).get(0)).body.getPositionY());
             } catch (Exception e) {
                 Log.e("Barrel Delete",e.getMessage());
             }

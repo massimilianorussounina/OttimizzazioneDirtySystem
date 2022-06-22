@@ -38,7 +38,7 @@ public class GameWorld {
     protected final Box physicalSize, screenSize, currentView;
     private final MyContactListener contactListener;
     private final TouchConsumer touchConsumer;
-    private TouchHandler touchHandler;
+    protected TouchHandler touchHandler;
     private int numFps;
     private final HandlerUI handlerUI;
     private static final int VELOCITY_ITERATIONS = 8;
@@ -52,6 +52,7 @@ public class GameWorld {
     protected float positionYBulldozer;
     protected boolean zeroBarrel = false;
     protected GameObject gameOver;
+    protected long  scoreTime ,lastScoreTime=0;
 
 
     public GameWorld(Box physicalSize, Box screenSize, Activity theActivity,HandlerUI handlerUI) {
@@ -74,6 +75,7 @@ public class GameWorld {
         this.canvas = new Canvas(buffer);
         Rect src = new Rect();
         src.set(0,0,(int)bufferHeight,1080);
+        this.lastScoreTime=0;
     }
 
 
@@ -83,7 +85,7 @@ public class GameWorld {
 
         if (!gameOverFlag) {
             positionYBulldozer = bulldozer.body.getPositionY();
-            int direction = ((DynamicPositionComponent) bulldozer.owner.getComponent(ComponentType.Position).get(0)).direction;
+            int direction = ((DynamicPositionComponent) bulldozer.owner.components.get(ComponentType.Position).get(0)).direction;
             if (positionYBulldozer > 19.9f && direction == 1) {
                 rotationBulldozer(-8f, positionYBulldozer, this, -1, activity);
                 verifyAction = false;
@@ -101,17 +103,23 @@ public class GameWorld {
                 }
                 if (currentTime >= 0) {
                     currentTime = maxTime - (System.currentTimeMillis() - startTime);
-                    timerTex.setText(String.format("%02d:%02d",
+                    timerTex.text=String.format("%02d:%02d",
                             TimeUnit.MILLISECONDS.toMinutes(currentTime),
                             TimeUnit.MILLISECONDS.toSeconds(currentTime) -
                                     TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentTime))
-                    ));
+                    );
                 }
 
 
                 /* Update Score */
-                if (!gameOverFlag)
-                    score = (long) (score + (listBarrel.size() * 1.5f));
+                if (!gameOverFlag) {
+                    scoreTime = System.currentTimeMillis();
+                    if (scoreTime >= lastScoreTime) {
+                        lastScoreTime = scoreTime+1000;
+                        score = (long) (score +( (listBarrel.size() * 1.5f))*6);
+
+                    }
+                }
                 if (score >= maxScore[maxScore.length - 1]-1) {
                     deleteBulldozer();
                     gameOverFlag = true;
@@ -126,8 +134,8 @@ public class GameWorld {
                     saveGame();
                 }
 
-                numberBarrelText.setText(String.format("%02d", numberBarrel));
-                textScore.setText("Score: " + score);
+                numberBarrelText.text=String.format("%02d", numberBarrel);
+                textScore.text="Score: " + score;
             }
 
             if (listBarrel.size() == 0) {
@@ -144,7 +152,7 @@ public class GameWorld {
                         }
                     }
                     if (gameObjectBulldozer != null) {
-                        List<Component> components = gameObjectBulldozer.getComponent(ComponentType.AI);
+                        List<Component> components = gameObjectBulldozer.components.get(ComponentType.AI);
                         if (components != null) {
                             for (Component component : components) {
                                 Action action = ((FsmAIComponent) component).fsm.stepAndGetAction(this);
@@ -198,7 +206,7 @@ public class GameWorld {
         canvas.drawARGB(100,126,193,243);
 
         for(GameObject gameObject: listGameObject){
-            List<Component> components = gameObject.getComponent(ComponentType.Drawable);
+            List<Component> components = gameObject.components.get(ComponentType.Drawable);
             if(components != null){
                 for (Component component: components) {
                     ((DrawableComponent) component).draw(buffer);
@@ -215,7 +223,7 @@ public class GameWorld {
         if(obj.name!=null && obj.name.equals("bulldozer")) {
             gameObjectBulldozer = obj;
             listGameObject.add(obj);
-            for (Component psh : obj.getComponent(ComponentType.Physics)) {
+            for (Component psh : obj.components.get(ComponentType.Physics)) {
                 if (((PhysicsComponent)psh).name.equals("chassis")){
                     bulldozer=(PhysicsComponent)psh;
                 }
@@ -226,17 +234,17 @@ public class GameWorld {
             listGameObject.add(0,obj);
         } else if (obj.name!= null && obj.name.equals("timer")){
 
-            timerTex=(TextDrawableComponent)obj.getComponent(ComponentType.Drawable).get(0);
+            timerTex=(TextDrawableComponent)obj.components.get(ComponentType.Drawable).get(0);
             listGameObject.add(obj);
 
         } else if (obj.name!= null && obj.name.equals("numberBarrel")){
 
-            numberBarrelText=(TextDrawableComponent)obj.getComponent(ComponentType.Drawable).get(0);
+            numberBarrelText=(TextDrawableComponent)obj.components.get(ComponentType.Drawable).get(0);
             listGameObject.add(obj);
 
         } else if(obj.name!= null && obj.name.equals("textScore")){
 
-            textScore = (TextDrawableComponent)obj.getComponent(ComponentType.Drawable).get(0);
+            textScore = (TextDrawableComponent)obj.components.get(ComponentType.Drawable).get(0);
             listGameObject.add(obj);
 
         } else {
@@ -304,8 +312,8 @@ public class GameWorld {
         }
 
         if(gameObjectBulldozer != null){
-            List<Component> componentsAi = gameObjectBulldozer.getComponent(ComponentType.AI);
-            List<Component> componentsPhysics = gameObjectBulldozer.getComponent(ComponentType.Physics);
+            List<Component> componentsAi = gameObjectBulldozer.components.get(ComponentType.AI);
+            List<Component> componentsPhysics = gameObjectBulldozer.components.get(ComponentType.Physics);
             listGameObject.remove(gameObjectBulldozer);
 
             if(componentsPhysics != null){
@@ -334,8 +342,8 @@ public class GameWorld {
         }
 
         if (gameObjectBulldozer != null) {
-            List<Component> componentsAi = gameObjectBulldozer.getComponent(ComponentType.AI);
-            List<Component> componentsPhysics = gameObjectBulldozer.getComponent(ComponentType.Physics);
+            List<Component> componentsAi = gameObjectBulldozer.components.get(ComponentType.AI);
+            List<Component> componentsPhysics = gameObjectBulldozer.components.get(ComponentType.Physics);
             listGameObject.remove(gameObjectBulldozer);
 
             if (componentsPhysics != null) {
@@ -387,9 +395,7 @@ public class GameWorld {
     }
 
 
-    public void setTouchHandler(TouchHandler touchHandler) {
-        this.touchHandler = touchHandler;
-    }
+
 
 
     public void eventTouch(float coordinateX, float coordinateY){
@@ -401,7 +407,7 @@ public class GameWorld {
                     flagCollisionBarrel = true;
                     GameObject.createBarrel(13f, coordinateY, this);
                     numberBarrel = numberBarrel - 1;
-                    numberBarrelText.setText(String.format("%02d", numberBarrel));
+                    numberBarrelText.text=String.format("%02d", numberBarrel);
                 }
             }
         }
@@ -455,9 +461,9 @@ public class GameWorld {
             return 0;
         }else{
             for (GameObject g: listBarrel) {
-                List<Component> positionComponents = g.getComponent(ComponentType.Position);
+                List<Component> positionComponents = g.components.get(ComponentType.Position);
                 PositionComponent positionComponent = (PositionComponent) positionComponents.get(0);
-                    if(positionYBulldozer > positionComponent.getCoordinateY() ){
+                    if(positionYBulldozer > positionComponent.coordinateY ){
                         contLeft = contLeft+1;
 
                     }else{
@@ -474,14 +480,14 @@ public class GameWorld {
 
 
     protected void burnedBarrel(int direction,GameWorld gameWorld,Activity context){
-        int invert = ((DynamicPositionComponent) bulldozer.owner.getComponent(ComponentType.Position).get(0)).direction;
+        int invert = ((DynamicPositionComponent) bulldozer.owner.components.get(ComponentType.Position).get(0)).direction;
         float positionYBulldozer = bulldozer.body.getPositionY();
         if(invert != direction){
             float positionXBulldozer = bulldozer.body.getPositionX();
             rotationBulldozer(positionXBulldozer,positionYBulldozer,gameWorld,direction,context);
         }
 
-        for(Component c:bulldozer.owner.getComponent(ComponentType.Joint)){
+        for(Component c:bulldozer.owner.components.get(ComponentType.Joint)){
             if(c instanceof RevoluteJointComponent) {
                 if (((RevoluteJointComponent) c).joint.isMotorEnabled())
                     ((RevoluteJointComponent) c).joint.setMotorSpeed(direction * speed);
@@ -493,12 +499,12 @@ public class GameWorld {
 
     protected void moveToCenter(GameWorld gameWorld, Activity context){
         float positionYBulldozer = bulldozer.body.getPositionY();
-        DynamicPositionComponent dynamicPositionComponent = (DynamicPositionComponent) (gameObjectBulldozer).getComponent(ComponentType.Position).get(0);
+        DynamicPositionComponent dynamicPositionComponent = (DynamicPositionComponent) (gameObjectBulldozer).components.get(ComponentType.Position).get(0);
         int direction = (dynamicPositionComponent.direction);
 
         if(direction == -1){
             if(positionYBulldozer < 0.1f){
-                for(Component componentBulldozer :gameObjectBulldozer.getComponent(ComponentType.Joint)){
+                for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
                     if(componentBulldozer instanceof RevoluteJointComponent) {
                         ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(0f);
                         ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(30f);
@@ -507,14 +513,14 @@ public class GameWorld {
             }else{
                 if (positionYBulldozer < -0.5f) {
                     rotationBulldozer(-8f, positionYBulldozer, this, 1, activity);
-                    for(Component componentBulldozer :gameObjectBulldozer.getComponent(ComponentType.Joint)){
+                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
                             ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(speed);
                             ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
                         }
                     }
                 }else{
-                    for(Component componentBulldozer :gameObjectBulldozer.getComponent(ComponentType.Joint)){
+                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
                             ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(-speed);
                             ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
@@ -524,7 +530,7 @@ public class GameWorld {
             }
         }else{
             if(positionYBulldozer >= -0.1f ){
-                for(Component componentBulldozer :gameObjectBulldozer.getComponent(ComponentType.Joint)){
+                for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
                     if(componentBulldozer instanceof RevoluteJointComponent) {
                         ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(0f);
                         ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(30f);
@@ -533,14 +539,14 @@ public class GameWorld {
             }else{
                 if (positionYBulldozer > 3) {
                     rotationBulldozer(-8f, positionYBulldozer, this, -1, activity);
-                    for(Component componentBulldozer :gameObjectBulldozer.getComponent(ComponentType.Joint)){
+                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
                             ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(-speed);
                             ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
                         }
                     }
                 }else{
-                    for(Component componentBulldozer :gameObjectBulldozer.getComponent(ComponentType.Joint)){
+                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
                             ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(speed);
                             ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
@@ -557,18 +563,7 @@ public class GameWorld {
     }
 
 
-    public void setTimerPause(long time){
-        this.timerPause=time;
-    }
 
 
-    public void setTimeResume(long time){
-        this.timeResume=time;
-    }
-
-
-    public long getScore() {
-        return score;
-    }
 
 }

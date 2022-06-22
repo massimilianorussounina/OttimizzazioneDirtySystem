@@ -124,7 +124,7 @@ public class FSMParser {
                 }else{
                     transition = new Transition(fState, tState,null);
                 }
-                fState.addTransitionsOut(transition);
+                fState.transitionsOut.add(transition);
             }
 
         }

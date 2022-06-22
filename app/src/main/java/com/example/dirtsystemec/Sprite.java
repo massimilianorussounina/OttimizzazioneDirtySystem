@@ -47,8 +47,8 @@ class FireSprite extends Sprite {
     public void draw(long currentValue) {
         canvas.save();
         canvas.rotate(90, coordinate_x, coordinate_y);
-        if (currentValue - lastValue > spriteSheet.getDelay()[currentAnimation]) {
-            if (currentAnimation >= spriteSheet.getDelay().length - 1) {
+        if (currentValue - lastValue > spriteSheet.delay[currentAnimation]) {
+            if (currentAnimation >= spriteSheet.delay.length - 1) {
                 currentAnimation = 0;
             } else {
                 currentAnimation = currentAnimation + 1;
@@ -74,8 +74,8 @@ class SeaSprite extends Sprite{
         canvas.save();
         canvas.rotate(90, coordinate_x, coordinate_y);
 
-        if(currentValue-lastValue > spriteSheet.getDelay()[currentAnimation]){
-            if(currentAnimation >= spriteSheet.getDelay().length-1){
+        if(currentValue-lastValue > spriteSheet.delay[currentAnimation]){
+            if(currentAnimation >= spriteSheet.delay.length-1){
                 currentAnimation = 0;
             }else{
                 currentAnimation = currentAnimation + 1;

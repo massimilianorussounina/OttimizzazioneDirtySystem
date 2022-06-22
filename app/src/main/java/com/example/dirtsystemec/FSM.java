@@ -22,19 +22,13 @@ class State{
     }
 
 
-    public Action activeAction() {
-        return activeAction;
-    }
 
 
-    public List<Transition> outGoingTransitions() {
-        return transitionsOut;
-    }
 
 
-    public void addTransitionsOut(Transition transition) {
-        this.transitionsOut.add(transition);
-    }
+
+
+
 
 }
 
@@ -54,7 +48,7 @@ class Transition{
 
 
     public boolean isTriggered(GameWorld gameWorld) {
-       Action action = targetState.activeAction();
+       Action action = targetState.activeAction;
 
         if(action.equals(Action.burned)){
             return gameWorld.listBarrel.size() != 0;
@@ -85,7 +79,7 @@ public class FSM {
     public Action stepAndGetAction(GameWorld gameWorld){
         Transition transitionTrigger = null;
 
-        for (Transition transition: currentState.outGoingTransitions()) {
+        for (Transition transition: currentState.transitionsOut) {
             if(transition.isTriggered(gameWorld)){
                 transitionTrigger = transition;
                 break;

@@ -7,11 +7,11 @@ import java.util.Map;
 
 public class Entity {
 
-    private final Map<ComponentType,ArrayList<Component>> components = new HashMap<>();
+    protected final Map<ComponentType,ArrayList<Component>> components = new HashMap<>();
 
 
     public void addComponent(Component component){
-        component.setOwner(this);
+        component.owner=this;
         ArrayList<Component> list = components.get(component.type());
 
         if(list == null){
@@ -25,8 +25,7 @@ public class Entity {
     }
 
 
-    public List<Component> getComponent(ComponentType type){
-        return components.get(type);
-    }
+
+    
 
 }
