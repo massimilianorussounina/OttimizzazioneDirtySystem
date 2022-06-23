@@ -85,7 +85,7 @@ public class GameWorld {
 
         if (!gameOverFlag) {
             positionYBulldozer = bulldozer.body.getPositionY();
-            int direction = ((DynamicPositionComponent) bulldozer.owner.components.get(ComponentType.Position).get(0)).direction;
+            int direction = ((DynamicPositionComponent) bulldozer.owner.components.get(ComponentType.Position.hashCode()).get(0)).direction;
             if (positionYBulldozer > 19.9f && direction == 1) {
                 rotationBulldozer(-8f, positionYBulldozer, this, -1, activity);
                 verifyAction = false;
@@ -152,7 +152,7 @@ public class GameWorld {
                         }
                     }
                     if (gameObjectBulldozer != null) {
-                        List<Component> components = gameObjectBulldozer.components.get(ComponentType.AI);
+                        List<Component> components = gameObjectBulldozer.components.get(ComponentType.AI.hashCode());
                         if (components != null) {
                             for (Component component : components) {
                                 Action action = ((FsmAIComponent) component).fsm.stepAndGetAction(this);
@@ -206,7 +206,7 @@ public class GameWorld {
         canvas.drawARGB(100,126,193,243);
 
         for(GameObject gameObject: listGameObject){
-            List<Component> components = gameObject.components.get(ComponentType.Drawable);
+            List<Component> components = gameObject.components.get(ComponentType.Drawable.hashCode());
             if(components != null){
                 for (Component component: components) {
                     ((DrawableComponent) component).draw(buffer);
@@ -223,7 +223,7 @@ public class GameWorld {
         if(obj.name!=null && obj.name.equals("bulldozer")) {
             gameObjectBulldozer = obj;
             listGameObject.add(obj);
-            for (Component psh : obj.components.get(ComponentType.Physics)) {
+            for (Component psh : obj.components.get(ComponentType.Physics.hashCode())) {
                 if (((PhysicsComponent)psh).name.equals("chassis")){
                     bulldozer=(PhysicsComponent)psh;
                 }
@@ -234,17 +234,17 @@ public class GameWorld {
             listGameObject.add(0,obj);
         } else if (obj.name!= null && obj.name.equals("timer")){
 
-            timerTex=(TextDrawableComponent)obj.components.get(ComponentType.Drawable).get(0);
+            timerTex=(TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
             listGameObject.add(obj);
 
         } else if (obj.name!= null && obj.name.equals("numberBarrel")){
 
-            numberBarrelText=(TextDrawableComponent)obj.components.get(ComponentType.Drawable).get(0);
+            numberBarrelText=(TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
             listGameObject.add(obj);
 
         } else if(obj.name!= null && obj.name.equals("textScore")){
 
-            textScore = (TextDrawableComponent)obj.components.get(ComponentType.Drawable).get(0);
+            textScore = (TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
             listGameObject.add(obj);
 
         } else {
@@ -312,8 +312,8 @@ public class GameWorld {
         }
 
         if(gameObjectBulldozer != null){
-            List<Component> componentsAi = gameObjectBulldozer.components.get(ComponentType.AI);
-            List<Component> componentsPhysics = gameObjectBulldozer.components.get(ComponentType.Physics);
+            List<Component> componentsAi = gameObjectBulldozer.components.get(ComponentType.AI.hashCode());
+            List<Component> componentsPhysics = gameObjectBulldozer.components.get(ComponentType.Physics.hashCode());
             listGameObject.remove(gameObjectBulldozer);
 
             if(componentsPhysics != null){
@@ -342,8 +342,8 @@ public class GameWorld {
         }
 
         if (gameObjectBulldozer != null) {
-            List<Component> componentsAi = gameObjectBulldozer.components.get(ComponentType.AI);
-            List<Component> componentsPhysics = gameObjectBulldozer.components.get(ComponentType.Physics);
+            List<Component> componentsAi = gameObjectBulldozer.components.get(ComponentType.AI.hashCode());
+            List<Component> componentsPhysics = gameObjectBulldozer.components.get(ComponentType.Physics.hashCode());
             listGameObject.remove(gameObjectBulldozer);
 
             if (componentsPhysics != null) {
@@ -461,7 +461,7 @@ public class GameWorld {
             return 0;
         }else{
             for (GameObject g: listBarrel) {
-                List<Component> positionComponents = g.components.get(ComponentType.Position);
+                List<Component> positionComponents = g.components.get(ComponentType.Position.hashCode());
                 PositionComponent positionComponent = (PositionComponent) positionComponents.get(0);
                     if(positionYBulldozer > positionComponent.coordinateY ){
                         contLeft = contLeft+1;
@@ -480,14 +480,14 @@ public class GameWorld {
 
 
     protected void burnedBarrel(int direction,GameWorld gameWorld,Activity context){
-        int invert = ((DynamicPositionComponent) bulldozer.owner.components.get(ComponentType.Position).get(0)).direction;
+        int invert = ((DynamicPositionComponent) bulldozer.owner.components.get(ComponentType.Position.hashCode()).get(0)).direction;
         float positionYBulldozer = bulldozer.body.getPositionY();
         if(invert != direction){
             float positionXBulldozer = bulldozer.body.getPositionX();
             rotationBulldozer(positionXBulldozer,positionYBulldozer,gameWorld,direction,context);
         }
 
-        for(Component c:bulldozer.owner.components.get(ComponentType.Joint)){
+        for(Component c:bulldozer.owner.components.get(ComponentType.Joint.hashCode())){
             if(c instanceof RevoluteJointComponent) {
                 if (((RevoluteJointComponent) c).joint.isMotorEnabled())
                     ((RevoluteJointComponent) c).joint.setMotorSpeed(direction * speed);
@@ -499,12 +499,12 @@ public class GameWorld {
 
     protected void moveToCenter(GameWorld gameWorld, Activity context){
         float positionYBulldozer = bulldozer.body.getPositionY();
-        DynamicPositionComponent dynamicPositionComponent = (DynamicPositionComponent) (gameObjectBulldozer).components.get(ComponentType.Position).get(0);
+        DynamicPositionComponent dynamicPositionComponent = (DynamicPositionComponent) (gameObjectBulldozer).components.get(ComponentType.Position.hashCode()).get(0);
         int direction = (dynamicPositionComponent.direction);
 
         if(direction == -1){
             if(positionYBulldozer < 0.1f){
-                for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
+                for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                     if(componentBulldozer instanceof RevoluteJointComponent) {
                         ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(0f);
                         ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(30f);
@@ -513,14 +513,14 @@ public class GameWorld {
             }else{
                 if (positionYBulldozer < -0.5f) {
                     rotationBulldozer(-8f, positionYBulldozer, this, 1, activity);
-                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
+                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
                             ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(speed);
                             ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
                         }
                     }
                 }else{
-                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
+                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
                             ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(-speed);
                             ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
@@ -530,7 +530,7 @@ public class GameWorld {
             }
         }else{
             if(positionYBulldozer >= -0.1f ){
-                for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
+                for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                     if(componentBulldozer instanceof RevoluteJointComponent) {
                         ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(0f);
                         ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(30f);
@@ -539,14 +539,14 @@ public class GameWorld {
             }else{
                 if (positionYBulldozer > 3) {
                     rotationBulldozer(-8f, positionYBulldozer, this, -1, activity);
-                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
+                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
                             ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(-speed);
                             ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
                         }
                     }
                 }else{
-                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint)){
+                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
                             ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(speed);
                             ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);

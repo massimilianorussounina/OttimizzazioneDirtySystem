@@ -206,7 +206,7 @@ public class MainActivity extends Activity {
         for(GameObject obj: gw.listBarrel){
             try {
 
-                barrelList.add(((PhysicsComponent)obj.components.get(ComponentType.Physics).get(0)).body.getPositionY());
+                barrelList.add(((PhysicsComponent)obj.components.get(ComponentType.Physics.hashCode()).get(0)).body.getPositionY());
             } catch (Exception e) {
                 Log.e("Barrel Delete",e.getMessage());
             }
