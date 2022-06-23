@@ -14,6 +14,9 @@ import com.google.fpl.liquidfun.World;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 
@@ -28,10 +31,12 @@ public class GameWorld {
     protected Bitmap buffer;
     private final Canvas canvas;
     protected static boolean gameOverFlag = false;
-    protected List<GameObject> listGameObject;
+    //protected List<GameObject> listGameObject;
+    protected Queue<GameObject> listGameObject;
     private volatile boolean verifyAction = false;
     private long timeOfLastSound = 0;
-    protected volatile List<GameObject> listBarrel ;
+    //protected volatile List<GameObject> listBarrel ;
+    protected volatile Queue<GameObject> listBarrel ;
     protected PhysicsComponent bulldozer;
     protected  World world;
     protected GameObject gameObjectBulldozer;
@@ -70,8 +75,9 @@ public class GameWorld {
         world.setContactListener(contactListener);
         this.touchConsumer = new TouchConsumer(this);
 
-        this.listGameObject = new ArrayList<>();
-        this.listBarrel = new ArrayList<>();
+        //this.listGameObject = new ArrayList<>();
+        this.listGameObject = new LinkedBlockingDeque<>();
+        this.listBarrel = new LinkedBlockingDeque<>();
         this.canvas = new Canvas(buffer);
         Rect src = new Rect();
         src.set(0,0,(int)bufferHeight,1080);
@@ -231,7 +237,8 @@ public class GameWorld {
 
         } else if(obj.name!=null && obj.name.equals("barrel")){
 
-            listGameObject.add(0,obj);
+            //listGameObject.add(0,obj);
+            listGameObject.add(obj);
         } else if (obj.name!= null && obj.name.equals("timer")){
 
             timerTex=(TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
@@ -415,7 +422,7 @@ public class GameWorld {
             handlerUI.sendEmptyMessage(1);
             score=0;
             startTime= System.currentTimeMillis();
-            listBarrel= new ArrayList<>();
+            listBarrel= new LinkedBlockingDeque<>();
             currentTime=0;
             numberBarrel=5;
             level=1;
