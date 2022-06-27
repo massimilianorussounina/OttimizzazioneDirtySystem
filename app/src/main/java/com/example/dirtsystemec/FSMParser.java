@@ -28,24 +28,24 @@ public class FSMParser {
     }
 
 
-    public FSM createFSM(String fileJSON){
+    public static FSM createFSM(String fileJSON,FSMParser fsmParser){
         FSM fsm = null;
         try{
-            InputStream inputStream = context.getAssets().open(fileJSON);
+            InputStream inputStream = fsmParser.context.getAssets().open(fileJSON);
             JsonObject jsonResults = new JsonParser().parse(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).getAsJsonObject();
 
             /* Creazione degli stati */
             JsonArray jsonArrayState = jsonResults.getAsJsonArray("state");
-            states = new ArrayList<>();
+            fsmParser.states = new ArrayList<>();
             for(int i = 0; i < jsonArrayState.size(); i++){
-                createStates(jsonArrayState.get(i).getAsJsonObject());
+                createStates(jsonArrayState.get(i).getAsJsonObject(),fsmParser);
             }
             /* ------------------------------ */
 
             /* Creazione delle transizioni */
             JsonArray jsonArrayTransition = jsonResults.getAsJsonArray("transition");
             for(int i = 0; i < jsonArrayTransition.size(); i++){
-                createTransitions(jsonArrayTransition.get(i).getAsJsonObject());
+                fsmParser.createTransitions(jsonArrayTransition.get(i).getAsJsonObject(),fsmParser);
             }
             /* ------------------------------ */
 
@@ -53,7 +53,7 @@ public class FSMParser {
             JsonElement jsonElementStart = jsonResults.get("startState");
             State startState = null;
             if(jsonElementStart != null){
-                for (State s : states
+                for (State s : fsmParser.states
                 ) {
                     if (s.name.equals(jsonElementStart.getAsString())) {
                         startState = s;
@@ -73,7 +73,7 @@ public class FSMParser {
     }
 
 
-    private void createStates(JsonObject jsonObject){
+    private static void createStates(JsonObject jsonObject,FSMParser fsmParser){
         String name = jsonObject.get("name").getAsString();
         String activeAction = jsonObject.get("action").getAsString();
         State state;
@@ -88,12 +88,12 @@ public class FSMParser {
                 default:
                     throw new IllegalStateException("Unexpected value: " + activeAction);
             }
-            states.add(state);
+            fsmParser.states.add(state);
         }
     }
 
 
-    private void createTransitions(JsonObject jsonObject) {
+    private static void createTransitions(JsonObject jsonObject, FSMParser fsmParser) {
         String fromState = jsonObject.get("from").getAsString();
         String targetState = jsonObject.get("to").getAsString();
         String action = jsonObject.get("action").getAsString();
@@ -102,7 +102,7 @@ public class FSMParser {
             State fState = null;
             State tState = null;
 
-            for (State s : states
+            for (State s : fsmParser.states
             ) {
                 if (s.name.equals(fromState)) {
                     fState = s;

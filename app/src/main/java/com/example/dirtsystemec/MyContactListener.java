@@ -15,9 +15,9 @@ public class MyContactListener extends ContactListener {
 
     protected Collection<Collision> cache = new HashSet<>();
 
-    public Collection<Collision> getCollisions() {
-        Collection<Collision> result = new HashSet<>(cache);
-        cache.clear();
+    public static Collection<Collision> getCollisions(MyContactListener myContactListener) {
+        Collection<Collision> result = new HashSet<>(myContactListener.cache);
+        myContactListener.cache.clear();
         return result;
     }
 
@@ -25,7 +25,7 @@ public class MyContactListener extends ContactListener {
      *  Hence, it cannot change the physical world.
      */
     @Override
-    public void beginContact(Contact contact) {
+    public  void beginContact(Contact contact) {
         Fixture fa = contact.getFixtureA(),
                 fb = contact.getFixtureB();
         Body ba = fa.getBody(), bb = fb.getBody();

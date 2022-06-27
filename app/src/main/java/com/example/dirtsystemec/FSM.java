@@ -47,8 +47,8 @@ class Transition{
     }
 
 
-    public boolean isTriggered(GameWorld gameWorld) {
-       Action action = targetState.activeAction;
+    public static boolean isTriggered(GameWorld gameWorld,Transition transition) {
+       Action action = transition.targetState.activeAction;
 
         if(action.equals(Action.burned)){
             return gameWorld.listBarrel.size() != 0;
@@ -76,27 +76,23 @@ public class FSM {
     }
 
 
-    public Action stepAndGetAction(GameWorld gameWorld){
+    public static Action stepAndGetAction(GameWorld gameWorld,FSM fsm){
         Transition transitionTrigger = null;
 
-        for (Transition transition: currentState.transitionsOut) {
-            if(transition.isTriggered(gameWorld)){
+        for (Transition transition: fsm.currentState.transitionsOut) {
+            if(transition.isTriggered(gameWorld,transition)){
                 transitionTrigger = transition;
                 break;
             }
         }
 
         if(transitionTrigger != null){
-            currentState = transitionTrigger.targetState();
+            fsm.currentState = transitionTrigger.targetState();
             return transitionTrigger.action;
         }
         else{
-            return currentState.activeAction;
+            return fsm.currentState.activeAction;
         }
-    }
-
-    public State getCurrentState() {
-        return currentState;
     }
 
 }

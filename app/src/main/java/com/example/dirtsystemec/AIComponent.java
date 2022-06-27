@@ -24,7 +24,7 @@ class FsmAIComponent extends AIComponent{
 
         this.gameWorld = gameWorld;
         FSMParser fsmParser = new FSMParser(context);
-        this.fsm = fsmParser.createFSM(nameJson);
+        this.fsm = fsmParser.createFSM(nameJson,fsmParser);
     }
 
 }

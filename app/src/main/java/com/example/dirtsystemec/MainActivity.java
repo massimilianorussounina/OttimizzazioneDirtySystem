@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
         if(flagStart) {
             loadData();
         }
-        gw.setGravity(-10,0);
+        gw.setGravity(-10,0,gw);
 
         GameObject.createTimer(11,-2.7f,gw);
 

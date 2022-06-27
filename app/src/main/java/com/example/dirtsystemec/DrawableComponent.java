@@ -35,7 +35,7 @@ public abstract class DrawableComponent  extends Component{
     }
 
 
-    public abstract void draw(Bitmap buffer, float coordinate_x, float coordinate_y, float angle);
+    public  abstract void draw(Bitmap buffer, float coordinate_x, float coordinate_y, float angle);
 
 
     public void draw(Bitmap buffer){

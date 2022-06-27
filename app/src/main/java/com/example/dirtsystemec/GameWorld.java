@@ -85,73 +85,73 @@ public class GameWorld {
     }
 
 
-    public synchronized void update(float elapsedTime) {
+    public static synchronized void update(float elapsedTime,GameWorld gameWorld) {
         GameObject gameObjectBulldozer = null;
-        numFps++;
+        gameWorld.numFps++;
 
         if (!gameOverFlag) {
-            positionYBulldozer = bulldozer.body.getPositionY();
-            int direction = ((DynamicPositionComponent) bulldozer.owner.components.get(ComponentType.Position.hashCode()).get(0)).direction;
-            if (positionYBulldozer > 19.9f && direction == 1) {
-                rotationBulldozer(-8f, positionYBulldozer, this, -1, activity);
-                verifyAction = false;
-            } else if (positionYBulldozer < -19.9f && direction == -1) {
-                rotationBulldozer(-8f, positionYBulldozer, this, 1, activity);
-                verifyAction = false;
+            gameWorld.positionYBulldozer = gameWorld.bulldozer.body.getPositionY();
+            int direction = ((DynamicPositionComponent) gameWorld.bulldozer.owner.components.get(ComponentType.Position.hashCode()).get(0)).direction;
+            if (gameWorld.positionYBulldozer > 19.9f && direction == 1) {
+                rotationBulldozer(-8f, gameWorld.positionYBulldozer, gameWorld, -1, gameWorld.activity);
+                gameWorld.verifyAction = false;
+            } else if (gameWorld.positionYBulldozer < -19.9f && direction == -1) {
+                rotationBulldozer(-8f, gameWorld.positionYBulldozer, gameWorld, 1, gameWorld.activity);
+                gameWorld.verifyAction = false;
             }
 
             /* update Timer */
-            if (numFps == 10) {
-                if (timeResume != 0 && timerPause != 0) {
-                    startTime = startTime + (timeResume - timerPause);
-                    timeResume = 0;
-                    timerPause = 0;
+            if (gameWorld.numFps == 10) {
+                if (gameWorld.timeResume != 0 && gameWorld.timerPause != 0) {
+                    gameWorld.startTime =gameWorld.startTime + (gameWorld.timeResume - gameWorld.timerPause);
+                    gameWorld.timeResume = 0;
+                    gameWorld.timerPause = 0;
                 }
-                if (currentTime >= 0) {
-                    currentTime = maxTime - (System.currentTimeMillis() - startTime);
-                    timerTex.text=String.format("%02d:%02d",
-                            TimeUnit.MILLISECONDS.toMinutes(currentTime),
-                            TimeUnit.MILLISECONDS.toSeconds(currentTime) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentTime))
+                if (gameWorld.currentTime >= 0) {
+                    gameWorld.currentTime = gameWorld.maxTime - (System.currentTimeMillis() - gameWorld.startTime);
+                    gameWorld.timerTex.text=String.format("%02d:%02d",
+                            TimeUnit.MILLISECONDS.toMinutes(gameWorld.currentTime),
+                            TimeUnit.MILLISECONDS.toSeconds(gameWorld.currentTime) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(gameWorld.currentTime))
                     );
                 }
 
 
                 /* Update Score */
                 if (!gameOverFlag) {
-                    scoreTime = System.currentTimeMillis();
-                    if (scoreTime >= lastScoreTime) {
-                        lastScoreTime = scoreTime+1000;
-                        score = (long) (score +( (listBarrel.size() * 1.5f))*6);
+                    gameWorld.scoreTime = System.currentTimeMillis();
+                    if (gameWorld.scoreTime >= gameWorld.lastScoreTime) {
+                        gameWorld.lastScoreTime = gameWorld.scoreTime+1000;
+                        gameWorld.score = (long) (gameWorld.score +( (gameWorld.listBarrel.size() * 1.5f))*6);
 
                     }
                 }
-                if (score >= maxScore[maxScore.length - 1]-1) {
-                    deleteBulldozer();
+                if (gameWorld.score >= gameWorld.maxScore[gameWorld.maxScore.length - 1]-1) {
+                    deleteBulldozer(gameWorld);
                     gameOverFlag = true;
-                    gameOver = GameObject.createTextGameOver(0, -7.5f, this, "   WIN   ");
+                    gameWorld.gameOver = GameObject.createTextGameOver(0, -7.5f, gameWorld, "   WIN   ");
 
                 }
-                if (level < 10 && score >= maxScore[level]) {
-                    level = level + 1;
-                    numberBarrel=numBarrelLevel[level];
-                    if(level==5)
-                        speed=speed+3f;
-                    saveGame();
+                if (gameWorld.level < 10 && gameWorld.score >= gameWorld.maxScore[gameWorld.level]) {
+                    gameWorld.level = gameWorld.level + 1;
+                    gameWorld.numberBarrel=gameWorld.numBarrelLevel[gameWorld.level];
+                    if(gameWorld.level==5)
+                        gameWorld.speed=gameWorld.speed+3f;
+                    gameWorld.saveGame();
                 }
 
-                numberBarrelText.text=String.format("%02d", numberBarrel);
-                textScore.text="Score: " + score;
+                gameWorld.numberBarrelText.text=String.format("%02d", gameWorld.numberBarrel);
+                gameWorld.textScore.text="Score: " + gameWorld.score;
             }
 
-            if (listBarrel.size() == 0) {
-                verifyAction = false;
+            if (gameWorld.listBarrel.size() == 0) {
+                gameWorld.verifyAction = false;
             }
 
             /*    Inizio Fase AI   */
-            if (numFps == 10) {
-                if (!verifyAction) {
-                    for (GameObject gameObject : listGameObject) {
+            if (gameWorld.numFps == 10) {
+                if (!gameWorld.verifyAction) {
+                    for (GameObject gameObject : gameWorld.listGameObject) {
                         if (gameObject.name.equals("bulldozer")) {
                             gameObjectBulldozer = gameObject;
                             break;
@@ -161,61 +161,61 @@ public class GameWorld {
                         List<Component> components = gameObjectBulldozer.components.get(ComponentType.AI.hashCode());
                         if (components != null) {
                             for (Component component : components) {
-                                Action action = ((FsmAIComponent) component).fsm.stepAndGetAction(this);
+                                Action action = ((FsmAIComponent) component).fsm.stepAndGetAction(gameWorld,((FsmAIComponent) component).fsm);
                                 if (action != null) {
                                     if (action.equals(Action.burned)) {
-                                        int result = searchBarrel();
-                                        burnedBarrel(result, this, activity);
-                                        verifyAction = true;
+                                        int result = searchBarrel(gameWorld);
+                                        burnedBarrel(result, gameWorld, gameWorld.activity);
+                                        gameWorld.verifyAction = true;
                                     } else if (action.equals(Action.waited)) {
-                                        moveToCenter(this, activity);
+                                        moveToCenter(gameWorld, gameWorld.activity);
                                     }
                                 }
                             }
                         }
                     }
                 }
-                numFps = 0;
+                gameWorld.numFps = 0;
             }
 
             /*                     */
 
-            if (currentTime<0 ||  zeroBarrel) {
+            if (gameWorld.currentTime<0 || gameWorld.zeroBarrel) {
                 gameOverFlag = true;
-                gameOver = GameObject.createTextGameOver(0, -7.5f, this, "GAME OVER");
+                gameWorld.gameOver = GameObject.createTextGameOver(0, -7.5f, gameWorld, "GAME OVER");
             }
 
 
             /* Simulazione Fisica */
-            world.step(elapsedTime, VELOCITY_ITERATIONS, POSITION_ITERATIONS, PARTICLE_ITERATIONS);
+            gameWorld.world.step(elapsedTime, VELOCITY_ITERATIONS, POSITION_ITERATIONS, PARTICLE_ITERATIONS);
 
             /*                     */
 
             /* Fase Collisioni    */
-            handleCollisions(contactListener.getCollisions());
+            handleCollisions(MyContactListener.getCollisions(gameWorld.contactListener),gameWorld);
 
             /*                  */
             /* update Timer */
-            for (Input.TouchEvent event : touchHandler.getTouchEvents())
-                touchConsumer.consumeTouchEvent(event);
+            for (Input.TouchEvent event : gameWorld.touchHandler.getTouchEvents())
+                gameWorld.touchConsumer.consumeTouchEvent(event);
         }
         else {
-            deleteBulldozer();
-            for (Input.TouchEvent event : touchHandler.getTouchEvents())
-                touchConsumer.consumeTouchEvent(event);
+            deleteBulldozer(gameWorld);
+            for (Input.TouchEvent event : gameWorld.touchHandler.getTouchEvents())
+                gameWorld.touchConsumer.consumeTouchEvent(event);
         }
 
     }
 
 
-    public synchronized void render() {
-        canvas.drawARGB(100,126,193,243);
+    public static synchronized void render(GameWorld gameWorld) {
+        gameWorld.canvas.drawARGB(100,126,193,243);
 
-        for(GameObject gameObject: listGameObject){
+        for(GameObject gameObject: gameWorld.listGameObject){
             List<Component> components = gameObject.components.get(ComponentType.Drawable.hashCode());
             if(components != null){
                 for (Component component: components) {
-                    ((DrawableComponent) component).draw(buffer);
+                    ((DrawableComponent) component).draw(gameWorld.buffer);
                 }
             }
         }
@@ -224,94 +224,94 @@ public class GameWorld {
     }
 
 
-    public synchronized void addGameObject(GameObject obj) {
+    public static synchronized void addGameObject(GameObject obj,GameWorld gameWorld) {
 
         if(obj.name!=null && obj.name.equals("bulldozer")) {
-            gameObjectBulldozer = obj;
-            listGameObject.add(obj);
+            gameWorld.gameObjectBulldozer = obj;
+            gameWorld.listGameObject.add(obj);
             for (Component psh : obj.components.get(ComponentType.Physics.hashCode())) {
                 if (((PhysicsComponent)psh).name.equals("chassis")){
-                    bulldozer=(PhysicsComponent)psh;
+                    gameWorld.bulldozer=(PhysicsComponent)psh;
                 }
             }
 
         } else if(obj.name!=null && obj.name.equals("barrel")){
 
             //listGameObject.add(0,obj);
-            listGameObject.add(obj);
+            gameWorld.listGameObject.add(obj);
         } else if (obj.name!= null && obj.name.equals("timer")){
 
-            timerTex=(TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
-            listGameObject.add(obj);
+            gameWorld.timerTex=(TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
+            gameWorld.listGameObject.add(obj);
 
         } else if (obj.name!= null && obj.name.equals("numberBarrel")){
 
-            numberBarrelText=(TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
-            listGameObject.add(obj);
+            gameWorld.numberBarrelText=(TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
+            gameWorld.listGameObject.add(obj);
 
         } else if(obj.name!= null && obj.name.equals("textScore")){
 
-            textScore = (TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
-            listGameObject.add(obj);
+            gameWorld.textScore = (TextDrawableComponent)obj.components.get(ComponentType.Drawable.hashCode()).get(0);
+            gameWorld.listGameObject.add(obj);
 
         } else {
-            listGameObject.add(obj);
+            gameWorld.listGameObject.add(obj);
         }
     }
 
 
-    private void handleCollisions(Collection<Collision> collisions) {
+    private static void handleCollisions(Collection<Collision> collisions,GameWorld gameWorld) {
         for (Collision event: collisions) {
 
             if (event.a.name.equals("barrel")) {
-                if (!listBarrel.contains((GameObject) event.a.owner)) {
-                    flagCollisionBarrel = false;
-                    listBarrel.add((GameObject) event.a.owner);
-                    handleSoundCollisions(event);
-                    if (event.b.name.equals("incinerator")) handleDeleteBarrel(event);
+                if (!gameWorld.listBarrel.contains((GameObject) event.a.owner)) {
+                    gameWorld.flagCollisionBarrel = false;
+                    gameWorld.listBarrel.add((GameObject) event.a.owner);
+                    handleSoundCollisions(event,gameWorld);
+                    if (event.b.name.equals("incinerator")) handleDeleteBarrel(event,gameWorld);
                 } else if (event.b.name.equals("incinerator")) {
-                    handleSoundCollisions(event);
-                    handleDeleteBarrel(event);
+                    handleSoundCollisions(event,gameWorld);
+                    handleDeleteBarrel(event,gameWorld);
                 } else {
 
-                    handleSoundCollisions(event);
+                    handleSoundCollisions(event,gameWorld);
                 }
 
             } else if (event.b.name.equals("barrel")) {
 
-                if (!listBarrel.contains((GameObject) event.b.owner)) {
-                    flagCollisionBarrel = false;
-                    listBarrel.add((GameObject) event.b.owner);
-                   handleSoundCollisions(event);
-                    if (event.a.name.equals("incinerator")) handleDeleteBarrel(event);
+                if (!gameWorld.listBarrel.contains((GameObject) event.b.owner)) {
+                    gameWorld.flagCollisionBarrel = false;
+                    gameWorld.listBarrel.add((GameObject) event.b.owner);
+                   handleSoundCollisions(event,gameWorld);
+                    if (event.a.name.equals("incinerator")) handleDeleteBarrel(event,gameWorld);
                 } else if (event.a.name.equals("incinerator")) {
-                    handleSoundCollisions(event);
-                    handleDeleteBarrel(event);
+                    handleSoundCollisions(event,gameWorld);
+                    handleDeleteBarrel(event,gameWorld);
                 } else {
-                    handleSoundCollisions(event);
+                    handleSoundCollisions(event,gameWorld);
                 }
             }
         }
     }
 
 
-    private void handleSoundCollisions(Collision event){
+    private static void handleSoundCollisions(Collision event,GameWorld gameWorld){
         Sound sound = CollisionSounds.getSound(((GameObject)event.a.owner).name, ((GameObject)event.b.owner).name);
 
         if (sound!=null) {
             long currentTime = System.nanoTime();
-            if (currentTime - timeOfLastSound > 500_000_000) {
-                timeOfLastSound = currentTime;
+            if (currentTime - gameWorld.timeOfLastSound > 500_000_000) {
+                gameWorld.timeOfLastSound = currentTime;
                 sound.play(MainActivity.volumeSoundEffect);
             }
         }
     }
 
 
-    public void rotationBulldozer(float coordinateX, float coordinateY, GameWorld gameWorld, int direction, Activity context){
+    public static void rotationBulldozer(float coordinateX, float coordinateY, GameWorld gameWorld, int direction, Activity context){
         GameObject gameObjectBulldozer = null;
 
-        for(GameObject gameObject: listGameObject){
+        for(GameObject gameObject: gameWorld.listGameObject){
             if(gameObject.name.equals("bulldozer")){
                 gameObjectBulldozer = gameObject;
                 break;
@@ -321,27 +321,27 @@ public class GameWorld {
         if(gameObjectBulldozer != null){
             List<Component> componentsAi = gameObjectBulldozer.components.get(ComponentType.AI.hashCode());
             List<Component> componentsPhysics = gameObjectBulldozer.components.get(ComponentType.Physics.hashCode());
-            listGameObject.remove(gameObjectBulldozer);
+            gameWorld.listGameObject.remove(gameObjectBulldozer);
 
             if(componentsPhysics != null){
                 for (Component component : componentsPhysics){
-                    world.destroyBody(((PhysicsComponent)component).body);
+                    gameWorld.world.destroyBody(((PhysicsComponent)component).body);
                     ((PhysicsComponent)component).body.setUserData(null);
                     ((PhysicsComponent)component).body.delete();
                     ((PhysicsComponent)component).body = null;
                 }
             }
-            GameObject.createBulldozer(coordinateX,coordinateY,gameWorld,direction,context,componentsAi,speed);
-            verifyAction = false;
+            GameObject.createBulldozer(coordinateX,coordinateY,gameWorld,direction,context,componentsAi,gameWorld.speed);
+            gameWorld.verifyAction = false;
         }
 
     }
 
 
-    private void deleteBulldozer() {
+    private static void deleteBulldozer(GameWorld gameWorld) {
         GameObject gameObjectBulldozer = null;
 
-        for (GameObject gameObject : listGameObject) {
+        for (GameObject gameObject : gameWorld.listGameObject) {
             if (gameObject.name.equals("bulldozer")) {
                 gameObjectBulldozer = gameObject;
                 break;
@@ -351,11 +351,11 @@ public class GameWorld {
         if (gameObjectBulldozer != null) {
             List<Component> componentsAi = gameObjectBulldozer.components.get(ComponentType.AI.hashCode());
             List<Component> componentsPhysics = gameObjectBulldozer.components.get(ComponentType.Physics.hashCode());
-            listGameObject.remove(gameObjectBulldozer);
+            gameWorld.listGameObject.remove(gameObjectBulldozer);
 
             if (componentsPhysics != null) {
                 for (Component component : componentsPhysics) {
-                    world.destroyBody(((PhysicsComponent) component).body);
+                    gameWorld.world.destroyBody(((PhysicsComponent) component).body);
                     ((PhysicsComponent) component).body.setUserData(null);
                     ((PhysicsComponent) component).body.delete();
                     ((PhysicsComponent) component).body = null;
@@ -381,18 +381,18 @@ public class GameWorld {
         return ((y-currentView.ymin)/currentView.height)*bufferHeight;}
 
 
-    public float toPixelsXLength(float x) {
+    public  float toPixelsXLength(float x) {
         return x/currentView.width*bufferWidth;
     }
 
 
-    public float toPixelsYLength(float y) {
+    public  float toPixelsYLength(float y) {
         return y/currentView.height*bufferHeight;
     }
 
 
-    public synchronized void setGravity(float x, float y) {
-        world.setGravity(x, y);
+    public static synchronized void setGravity(float x, float y,GameWorld gameWorld) {
+        gameWorld.world.setGravity(x, y);
     }
 
 
@@ -405,69 +405,69 @@ public class GameWorld {
 
 
 
-    public void eventTouch(float coordinateX, float coordinateY){
+    public static void eventTouch(float coordinateX, float coordinateY,GameWorld gameWorld){
         if(!gameOverFlag) {
             if ((coordinateX <= 13.5f && coordinateX >= 9f) && (coordinateY >= 23f && coordinateY <= 26)) {
-                handlerUI.sendEmptyMessage(0);
-            }else if(!flagCollisionBarrel && ((coordinateY>=-22 && coordinateY <=21.6))){
-                if (numberBarrel > 0) {
-                    flagCollisionBarrel = true;
-                    GameObject.createBarrel(13f, coordinateY, this);
-                    numberBarrel = numberBarrel - 1;
-                    numberBarrelText.text=String.format("%02d", numberBarrel);
+                gameWorld.handlerUI.sendEmptyMessage(0);
+            }else if(! gameWorld.flagCollisionBarrel && ((coordinateY>=-22 && coordinateY <=21.6))){
+                if ( gameWorld.numberBarrel > 0) {
+                    gameWorld.flagCollisionBarrel = true;
+                    GameObject.createBarrel(13f, coordinateY, gameWorld);
+                    gameWorld.numberBarrel =  gameWorld.numberBarrel - 1;
+                    gameWorld.numberBarrelText.text=String.format("%02d",  gameWorld.numberBarrel);
                 }
             }
         }
         else{
-            handlerUI.sendEmptyMessage(1);
-            score=0;
-            startTime= System.currentTimeMillis();
-            listBarrel= new LinkedBlockingDeque<>();
-            currentTime=0;
-            numberBarrel=5;
-            level=1;
-            speed=7;
-            saveGame();
+            gameWorld.handlerUI.sendEmptyMessage(1);
+            gameWorld.score=0;
+            gameWorld.startTime= System.currentTimeMillis();
+            gameWorld.listBarrel= new LinkedBlockingDeque<>();
+            gameWorld.currentTime=0;
+            gameWorld.numberBarrel=5;
+            gameWorld.level=1;
+            gameWorld.speed=7;
+            gameWorld.saveGame();
         }
 
     }
 
 
-    public void handleDeleteBarrel(Collision event){
+    public static void handleDeleteBarrel(Collision event,GameWorld gameWorld){
         if(event.a.name.equals("incinerator")  && event.b.name.equals("barrel")){
-            listGameObject.remove((GameObject) event.b.owner);
-            listBarrel.remove((GameObject) event.b.owner);
-            world.destroyBody(event.b.body);
+            gameWorld.listGameObject.remove((GameObject) event.b.owner);
+            gameWorld.listBarrel.remove((GameObject) event.b.owner);
+            gameWorld.world.destroyBody(event.b.body);
             event.b.body.setUserData(null);
             event.b.body.delete();
             event.b.body = null;
-            if(listBarrel.size() == 0){
-                verifyAction = false;
+            if(gameWorld.listBarrel.size() == 0){
+                gameWorld.verifyAction = false;
             }
         }else if(event.a.name.equals("barrel")  && event.b.name.equals("incinerator")){
-            listGameObject.remove((GameObject) event.a.owner);
-            listBarrel.remove((GameObject) event.a.owner);
-            world.destroyBody(event.a.body);
+            gameWorld.listGameObject.remove((GameObject) event.a.owner);
+            gameWorld.listBarrel.remove((GameObject) event.a.owner);
+            gameWorld.world.destroyBody(event.a.body);
             event.a.body.setUserData(null);
             event.a.body.delete();
             event.a.body = null;
-            if(listBarrel.size() == 0){
-                verifyAction = false;
+            if(gameWorld.listBarrel.size() == 0){
+                gameWorld.verifyAction = false;
             }
         }
-        if(numberBarrel ==0 && listBarrel.isEmpty())
-            zeroBarrel=true;
+        if(gameWorld.numberBarrel ==0 && gameWorld.listBarrel.isEmpty())
+            gameWorld.zeroBarrel=true;
     }
 
 
-    protected int searchBarrel(){
+    protected static int searchBarrel(GameWorld gameWorld){
         int contRight = 0;
         int contLeft = 0;
-        float positionYBulldozer = bulldozer.body.getPositionY();
-        if(listBarrel.size() == 0){
+        float positionYBulldozer = gameWorld.bulldozer.body.getPositionY();
+        if(gameWorld.listBarrel.size() == 0){
             return 0;
         }else{
-            for (GameObject g: listBarrel) {
+            for (GameObject g: gameWorld.listBarrel) {
                 List<Component> positionComponents = g.components.get(ComponentType.Position.hashCode());
                 PositionComponent positionComponent = (PositionComponent) positionComponents.get(0);
                     if(positionYBulldozer > positionComponent.coordinateY ){
@@ -486,32 +486,32 @@ public class GameWorld {
     }
 
 
-    protected void burnedBarrel(int direction,GameWorld gameWorld,Activity context){
-        int invert = ((DynamicPositionComponent) bulldozer.owner.components.get(ComponentType.Position.hashCode()).get(0)).direction;
-        float positionYBulldozer = bulldozer.body.getPositionY();
+    protected static void burnedBarrel(int direction,GameWorld gameWorld,Activity context){
+        int invert = ((DynamicPositionComponent) gameWorld.bulldozer.owner.components.get(ComponentType.Position.hashCode()).get(0)).direction;
+        float positionYBulldozer = gameWorld.bulldozer.body.getPositionY();
         if(invert != direction){
-            float positionXBulldozer = bulldozer.body.getPositionX();
-            rotationBulldozer(positionXBulldozer,positionYBulldozer,gameWorld,direction,context);
+            float positionXBulldozer = gameWorld.bulldozer.body.getPositionX();
+            gameWorld.rotationBulldozer(positionXBulldozer,positionYBulldozer,gameWorld,direction,context);
         }
 
-        for(Component c:bulldozer.owner.components.get(ComponentType.Joint.hashCode())){
+        for(Component c:gameWorld.bulldozer.owner.components.get(ComponentType.Joint.hashCode())){
             if(c instanceof RevoluteJointComponent) {
                 if (((RevoluteJointComponent) c).joint.isMotorEnabled())
-                    ((RevoluteJointComponent) c).joint.setMotorSpeed(direction * speed);
-                ((RevoluteJointComponent) c).joint.setMaxMotorTorque(torque);
+                    ((RevoluteJointComponent) c).joint.setMotorSpeed(direction * gameWorld.speed);
+                ((RevoluteJointComponent) c).joint.setMaxMotorTorque(gameWorld.torque);
             }
         }
     }
 
 
-    protected void moveToCenter(GameWorld gameWorld, Activity context){
-        float positionYBulldozer = bulldozer.body.getPositionY();
-        DynamicPositionComponent dynamicPositionComponent = (DynamicPositionComponent) (gameObjectBulldozer).components.get(ComponentType.Position.hashCode()).get(0);
+    protected  static void moveToCenter(GameWorld gameWorld, Activity context){
+        float positionYBulldozer = gameWorld.bulldozer.body.getPositionY();
+        DynamicPositionComponent dynamicPositionComponent = (DynamicPositionComponent) (gameWorld.gameObjectBulldozer).components.get(ComponentType.Position.hashCode()).get(0);
         int direction = (dynamicPositionComponent.direction);
 
         if(direction == -1){
             if(positionYBulldozer < 0.1f){
-                for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
+                for(Component componentBulldozer :gameWorld.gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                     if(componentBulldozer instanceof RevoluteJointComponent) {
                         ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(0f);
                         ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(30f);
@@ -519,25 +519,25 @@ public class GameWorld {
                 }
             }else{
                 if (positionYBulldozer < -0.5f) {
-                    rotationBulldozer(-8f, positionYBulldozer, this, 1, activity);
-                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
+                    gameWorld.rotationBulldozer(-8f, positionYBulldozer, gameWorld, 1, context);
+                    for(Component componentBulldozer :gameWorld.gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
-                            ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(speed);
-                            ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
+                            ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(gameWorld.speed);
+                            ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(gameWorld.torque);
                         }
                     }
                 }else{
-                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
+                    for(Component componentBulldozer :gameWorld.gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
-                            ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(-speed);
-                            ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
+                            ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(-gameWorld.speed);
+                            ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(gameWorld.torque);
                         }
                     }
                 }
             }
         }else{
             if(positionYBulldozer >= -0.1f ){
-                for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
+                for(Component componentBulldozer :gameWorld.gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                     if(componentBulldozer instanceof RevoluteJointComponent) {
                         ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(0f);
                         ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(30f);
@@ -545,18 +545,18 @@ public class GameWorld {
                 }
             }else{
                 if (positionYBulldozer > 3) {
-                    rotationBulldozer(-8f, positionYBulldozer, this, -1, activity);
-                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
+                    gameWorld.rotationBulldozer(-8f, positionYBulldozer, gameWorld, -1, context);
+                    for(Component componentBulldozer :gameWorld.gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
-                            ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(-speed);
-                            ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
+                            ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(-gameWorld.speed);
+                            ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(gameWorld.torque);
                         }
                     }
                 }else{
-                    for(Component componentBulldozer :gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
+                    for(Component componentBulldozer :gameWorld.gameObjectBulldozer.components.get(ComponentType.Joint.hashCode())){
                         if(componentBulldozer instanceof RevoluteJointComponent) {
-                            ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(speed);
-                            ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(torque);
+                            ((RevoluteJointComponent) componentBulldozer).joint.setMotorSpeed(gameWorld.speed);
+                            ((RevoluteJointComponent) componentBulldozer).joint.setMaxMotorTorque(gameWorld.torque);
                         }
                     }
                 }

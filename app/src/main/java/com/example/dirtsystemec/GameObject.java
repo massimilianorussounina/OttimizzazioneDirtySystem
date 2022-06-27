@@ -34,7 +34,7 @@ public class GameObject extends Entity{
         gameObjectBarrel.addComponent(circlePhysicsComponent);
 
 
-        gameWorld.addGameObject(gameObjectBarrel);
+        gameWorld.addGameObject(gameObjectBarrel,gameWorld);
     }
 
 
@@ -56,7 +56,7 @@ public class GameObject extends Entity{
         gameObjectIncinerator.addComponent(staticPositionComponent);
         gameObjectIncinerator.addComponent(bitmapDrawableComponent);
         gameObjectIncinerator.addComponent(polygonPhysicsComponent);
-        gameWorld.addGameObject(gameObjectIncinerator);
+        gameWorld.addGameObject(gameObjectIncinerator,gameWorld);
     }
 
 
@@ -78,7 +78,7 @@ public class GameObject extends Entity{
         gameObjectSea.addComponent(polygonPhysicsComponent);
 
 
-        gameWorld.addGameObject(gameObjectSea);
+        gameWorld.addGameObject(gameObjectSea,gameWorld);
     }
 
 
@@ -93,7 +93,7 @@ public class GameObject extends Entity{
         gameObjectGround.addComponent(bitmapDrawableComponent);
         gameObjectGround.addComponent(polygonPhysicsComponent);
 
-        gameWorld.addGameObject(gameObjectGround);
+        gameWorld.addGameObject(gameObjectGround,gameWorld);
     }
 
 
@@ -122,7 +122,7 @@ public class GameObject extends Entity{
         gameObjectTowerRight.addComponent(trianglePositionComponentRight);
         gameObjectTowerRight.addComponent(bitmapDrawableComponentRight);
         gameObjectTowerRight.addComponent(polygonPhysicsComponentRight);
-        gameWorld.addGameObject(gameObjectTowerRight);
+        gameWorld.addGameObject(gameObjectTowerRight,gameWorld);
 
 
 
@@ -139,7 +139,7 @@ public class GameObject extends Entity{
         gameObjectTowerLeft.addComponent(trianglePositionComponentLeft);
         gameObjectTowerLeft.addComponent(bitmapDrawableComponentLeft);
         gameObjectTowerLeft.addComponent(polygonPhysicsComponentLeft);
-        gameWorld.addGameObject(gameObjectTowerLeft);
+        gameWorld.addGameObject(gameObjectTowerLeft,gameWorld);
 
 
 
@@ -154,7 +154,7 @@ public class GameObject extends Entity{
         gameObjectBridge.addComponent(dynamicPositionComponent);
         gameObjectBridge.addComponent(rectDrawableComponent);
         gameObjectBridge.addComponent(polygonPhysicsComponent);
-        gameWorld.addGameObject(gameObjectBridge);
+        gameWorld.addGameObject(gameObjectBridge,gameWorld);
 
     }
 
@@ -172,7 +172,7 @@ public class GameObject extends Entity{
 
         gameObjectEnclosure.addComponent(polygonPhysicsComponentTop);
         gameObjectEnclosure.addComponent(polygonPhysicsComponentBottom);
-        gameWorld.addGameObject(gameObjectEnclosure);
+        gameWorld.addGameObject(gameObjectEnclosure,gameWorld);
     }
 
 
@@ -180,7 +180,7 @@ public class GameObject extends Entity{
         float width=2.8f;
         int photochassis;
         int photocabin;
-        gameWorld.setGravity(0,0);
+        gameWorld.setGravity(0,0,gameWorld);
         GameObject gameObjectBulldozer = new GameObject(gameWorld,"bulldozer");
         DynamicPositionComponent dynamicPositionComponentBulldozer = new DynamicPositionComponent("bulldozer",coordinateX, coordinateY,gameObjectBulldozer,invert);
         gameObjectBulldozer.addComponent(dynamicPositionComponentBulldozer);
@@ -323,9 +323,9 @@ public class GameObject extends Entity{
         }
 
 
-        gameWorld.addGameObject(gameObjectBulldozer);
+        gameWorld.addGameObject(gameObjectBulldozer,gameWorld);
 
-        gameWorld.setGravity(-10,0);
+        gameWorld.setGravity(-10,0,gameWorld);
 
     }
 
@@ -344,7 +344,7 @@ public class GameObject extends Entity{
         bitmapDrawableComponent = new BitmapDrawableComponent("barrelIcon",gameObjectBarrelIcon,1.8f,2.5f,R.drawable.barrel_icon,0,0,58,80);
         gameObjectBarrelIcon.addComponent(staticPositionComponent);
         gameObjectBarrelIcon.addComponent(bitmapDrawableComponent);
-        gameWorld.addGameObject(gameObjectBarrelIcon);
+        gameWorld.addGameObject(gameObjectBarrelIcon,gameWorld);
     }
 
 
@@ -354,7 +354,7 @@ public class GameObject extends Entity{
         StaticPositionComponent staticPositionComponent = new StaticPositionComponent("timer",coordinateX,coordinateY,gameObjectTimer);
         gameObjectTimer.addComponent(textDrawableComponentTimer);
         gameObjectTimer.addComponent(staticPositionComponent);
-        gameWorld.addGameObject(gameObjectTimer);
+        gameWorld.addGameObject(gameObjectTimer,gameWorld);
     }
 
 
@@ -364,7 +364,7 @@ public class GameObject extends Entity{
         StaticPositionComponent staticPositionComponent = new StaticPositionComponent("numberBarrel",coordinateX,coordinateY,gameObjectTimer);
         gameObjectTimer.addComponent(textDrawableComponentTimer);
         gameObjectTimer.addComponent(staticPositionComponent);
-        gameWorld.addGameObject(gameObjectTimer);
+        gameWorld.addGameObject(gameObjectTimer,gameWorld);
     }
 
 
@@ -374,7 +374,7 @@ public class GameObject extends Entity{
         StaticPositionComponent staticPositionComponent = new StaticPositionComponent("textScore",coordinateX,coordinateY,gameObjectTimer);
         gameObjectTimer.addComponent(textDrawableComponentTimer);
         gameObjectTimer.addComponent(staticPositionComponent);
-        gameWorld.addGameObject(gameObjectTimer);
+        gameWorld.addGameObject(gameObjectTimer,gameWorld);
     }
 
 
@@ -384,7 +384,7 @@ public class GameObject extends Entity{
         StaticPositionComponent staticPositionComponent = new StaticPositionComponent("gameOver",coordinateX,coordinateY,gameObjectTimer);
         gameObjectTimer.addComponent(textDrawableComponentTimer);
         gameObjectTimer.addComponent(staticPositionComponent);
-        gameWorld.addGameObject(gameObjectTimer);
+        gameWorld.addGameObject(gameObjectTimer,gameWorld);
         return  gameObjectTimer;
     }
 
@@ -405,7 +405,7 @@ public class GameObject extends Entity{
         gameObjectSea.addComponent(spriteDrawableComponent);
 
 
-        gameWorld.addGameObject(gameObjectSea);
+        gameWorld.addGameObject(gameObjectSea,gameWorld);
     }
 
 
@@ -416,7 +416,7 @@ public class GameObject extends Entity{
         bitmapDrawableComponent = new BitmapDrawableComponent("buttonTrash",gameObjectButtonPause,2f,2f,R.drawable.button_pause,0,0,50,50);
         gameObjectButtonPause.addComponent(staticPositionComponent);
         gameObjectButtonPause.addComponent(bitmapDrawableComponent);
-        gameWorld.addGameObject(gameObjectButtonPause);
+        gameWorld.addGameObject(gameObjectButtonPause,gameWorld);
     }
 
 }
