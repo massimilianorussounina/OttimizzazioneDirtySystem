@@ -21,7 +21,7 @@ public class GameObject extends Entity{
         this.gameWorld = gameWorld;
     }
 
-    public static void createBarrel(float coordinateX, float coordinateY,GameWorld gameWorld) {
+    public static GameObject createBarrel(float coordinateX, float coordinateY,GameWorld gameWorld) {
         GameObject gameObjectBarrel = new GameObject(gameWorld,"barrel");
 
         DynamicPositionComponent dynamicPositionComponent = new DynamicPositionComponent("barrel",coordinateX,coordinateY,gameObjectBarrel);
@@ -35,6 +35,7 @@ public class GameObject extends Entity{
 
 
         gameWorld.addGameObject(gameObjectBarrel,gameWorld);
+        return gameObjectBarrel;
     }
 
 
@@ -170,11 +171,33 @@ public class GameObject extends Entity{
                 (coordinateXMin + (coordinateXMax - coordinateXMin)/2), coordinateYMax,(coordinateXMax - coordinateXMin),0.1f, 0,1);
 
 
+
         gameObjectEnclosure.addComponent(polygonPhysicsComponentTop);
         gameObjectEnclosure.addComponent(polygonPhysicsComponentBottom);
+
         gameWorld.addGameObject(gameObjectEnclosure,gameWorld);
     }
 
+    public static void createWarehouse (float coordinateXMax, float coordinateXMin,float coordinateYMax,float coordinateYMin,GameWorld gameWorld){
+        GameObject gameObjectWarehouse = new GameObject(gameWorld,"warehouse");
+        PolygonPhysicsComponent polygonPhysicsComponentTop = new PolygonPhysicsComponent("warehouse",gameObjectWarehouse,BodyType.staticBody,
+                (coordinateXMin + (coordinateXMax - coordinateXMin)/2), coordinateYMin,(coordinateXMax - coordinateXMin),0.1f, 0,1);
+
+
+        PolygonPhysicsComponent polygonPhysicsComponentBottom =  new PolygonPhysicsComponent("warehouse",gameObjectWarehouse,BodyType.staticBody,
+                (coordinateXMin + (coordinateXMax - coordinateXMin)/2), coordinateYMax,(coordinateXMax - coordinateXMin),0.1f, 0,1);
+
+        PolygonPhysicsComponent polygonPhysicsComponentLeft = new PolygonPhysicsComponent("warehouse",gameObjectWarehouse,BodyType.staticBody,
+                coordinateXMin, 0 , 1,coordinateYMax-coordinateYMin, 0,1);
+
+
+
+
+        gameObjectWarehouse.addComponent(polygonPhysicsComponentLeft);
+        gameObjectWarehouse.addComponent(polygonPhysicsComponentTop);
+        gameObjectWarehouse.addComponent(polygonPhysicsComponentBottom);
+        gameWorld.addGameObject(gameObjectWarehouse,gameWorld);
+    }
 
     public static void createBulldozer(float coordinateX, float coordinateY, GameWorld gameWorld, int invert, Context context, List<Component> componentAi,float speed){
         float width=2.8f;

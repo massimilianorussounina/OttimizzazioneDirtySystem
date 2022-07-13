@@ -12,14 +12,20 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.core.util.Pools;
+
 import com.badlogic.androidgames.framework.Audio;
 import com.badlogic.androidgames.framework.Music;
+import com.badlogic.androidgames.framework.Pool;
 import com.badlogic.androidgames.framework.impl.AndroidAudio;
 import com.badlogic.androidgames.framework.impl.MultiTouchHandler;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class MainActivity extends Activity {
 
@@ -113,6 +119,9 @@ public class MainActivity extends Activity {
         GameObject.createBridge(-7.6f,0,-8.5f,4.5f,-2f,0f,-2f,1f,2f,1f
                 ,-8.5f,-4.5f,2f,0f,2f,1f,-2f,1f,gw);
 
+        GameObject.createWarehouse(27f,13.5f,coordinateYMax,coordinateYMin,gw);
+
+
 
         GameObject.createSea(-13.4f,0f,-12.5f,0f,gw);
         GameObject.createGround(-11.5f,7.0f,gw);
@@ -133,6 +142,8 @@ public class MainActivity extends Activity {
         GameObject.createTextScore(11.25f,-21f,gw);
         GameObject.createButtonPause(11f,22f,gw);
         GameObject.createBarrelIcon(11.7f,-22.8f,gw);
+
+
 
         renderView = new AndroidFastRenderView(this, gw);
 

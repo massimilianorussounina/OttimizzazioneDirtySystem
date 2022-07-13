@@ -6,9 +6,14 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.Log;
 
+import androidx.core.util.Pools;
+
 import com.badlogic.androidgames.framework.Input;
+import com.badlogic.androidgames.framework.Pool;
 import com.badlogic.androidgames.framework.Sound;
 import com.badlogic.androidgames.framework.impl.TouchHandler;
+import com.google.fpl.liquidfun.Fixture;
+import com.google.fpl.liquidfun.Vec2;
 import com.google.fpl.liquidfun.World;
 
 import java.util.ArrayList;
@@ -59,6 +64,10 @@ public class GameWorld {
     protected GameObject gameOver;
     protected long  scoreTime ,lastScoreTime=0;
 
+    protected PhysicsComponent physicsComponentBarrel;
+    protected  volatile Pools.SimplePool<GameObject> listBarrelWharehouse;
+
+
 
     public GameWorld(Box physicalSize, Box screenSize, Activity theActivity,HandlerUI handlerUI) {
         this.physicalSize = physicalSize;
@@ -82,6 +91,8 @@ public class GameWorld {
         Rect src = new Rect();
         src.set(0,0,(int)bufferHeight,1080);
         this.lastScoreTime=0;
+
+        listBarrelWharehouse= new Pools.SimplePool<>(10);
     }
 
 
@@ -204,7 +215,6 @@ public class GameWorld {
             for (Input.TouchEvent event : gameWorld.touchHandler.getTouchEvents())
                 gameWorld.touchConsumer.consumeTouchEvent(event);
         }
-
     }
 
 
@@ -263,7 +273,7 @@ public class GameWorld {
     private static void handleCollisions(Collection<Collision> collisions,GameWorld gameWorld) {
         for (Collision event: collisions) {
 
-            if (event.a.name.equals("barrel")) {
+            if (event.a.name.equals("barrel") && !event.b.name.equals("warehouse") && event.b.body.getPositionX()<=13f ) {
                 if (!gameWorld.listBarrel.contains((GameObject) event.a.owner)) {
                     gameWorld.flagCollisionBarrel = false;
                     gameWorld.listBarrel.add((GameObject) event.a.owner);
@@ -277,19 +287,18 @@ public class GameWorld {
                     handleSoundCollisions(event,gameWorld);
                 }
 
-            } else if (event.b.name.equals("barrel")) {
-
-                if (!gameWorld.listBarrel.contains((GameObject) event.b.owner)) {
-                    gameWorld.flagCollisionBarrel = false;
-                    gameWorld.listBarrel.add((GameObject) event.b.owner);
-                   handleSoundCollisions(event,gameWorld);
-                    if (event.a.name.equals("incinerator")) handleDeleteBarrel(event,gameWorld);
-                } else if (event.a.name.equals("incinerator")) {
-                    handleSoundCollisions(event,gameWorld);
-                    handleDeleteBarrel(event,gameWorld);
-                } else {
-                    handleSoundCollisions(event,gameWorld);
-                }
+            } else if (event.b.name.equals("barrel")&& !event.a.name.equals("warehouse") && event.b.body.getPositionX()<=13f  ) {
+                    if (!gameWorld.listBarrel.contains((GameObject) event.b.owner)) {
+                        gameWorld.flagCollisionBarrel = false;
+                        gameWorld.listBarrel.add((GameObject) event.b.owner);
+                       handleSoundCollisions(event,gameWorld);
+                        if (event.a.name.equals("incinerator")) handleDeleteBarrel(event,gameWorld);
+                    } else if (event.a.name.equals("incinerator")) {
+                        handleSoundCollisions(event,gameWorld);
+                        handleDeleteBarrel(event,gameWorld);
+                    } else {
+                        handleSoundCollisions(event,gameWorld);
+                    }
             }
         }
     }
@@ -406,13 +415,26 @@ public class GameWorld {
 
 
     public static void eventTouch(float coordinateX, float coordinateY,GameWorld gameWorld){
+        GameObject barrel;
         if(!gameOverFlag) {
             if ((coordinateX <= 13.5f && coordinateX >= 9f) && (coordinateY >= 23f && coordinateY <= 26)) {
                 gameWorld.handlerUI.sendEmptyMessage(0);
             }else if(! gameWorld.flagCollisionBarrel && ((coordinateY>=-22 && coordinateY <=21.6))){
                 if ( gameWorld.numberBarrel > 0) {
                     gameWorld.flagCollisionBarrel = true;
-                    GameObject.createBarrel(13f, coordinateY, gameWorld);
+                    barrel= gameWorld.listBarrelWharehouse.acquire();
+                    if(barrel==null) {
+                        GameObject.createBarrel(13f, coordinateY, gameWorld);
+                        Log.i("reciclo"," :no");
+                    }else{
+                       gameWorld.physicsComponentBarrel = (PhysicsComponent) barrel.components.get(ComponentType.Physics.hashCode()).get(0);
+
+                       gameWorld.physicsComponentBarrel.body.setTransform(13f,coordinateY,0);
+                        gameWorld.physicsComponentBarrel.body.setLinearVelocity(new Vec2(0,0));
+                        gameWorld.physicsComponentBarrel.body.setAngularVelocity(0);
+
+                       Log.i("reciclo"," :ok");
+                    }
                     gameWorld.numberBarrel =  gameWorld.numberBarrel - 1;
                     gameWorld.numberBarrelText.text=String.format("%02d",  gameWorld.numberBarrel);
                 }
@@ -434,23 +456,38 @@ public class GameWorld {
 
 
     public static void handleDeleteBarrel(Collision event,GameWorld gameWorld){
+        boolean inserito;
         if(event.a.name.equals("incinerator")  && event.b.name.equals("barrel")){
-            gameWorld.listGameObject.remove((GameObject) event.b.owner);
-            gameWorld.listBarrel.remove((GameObject) event.b.owner);
-            gameWorld.world.destroyBody(event.b.body);
-            event.b.body.setUserData(null);
-            event.b.body.delete();
-            event.b.body = null;
+
+            inserito=gameWorld.listBarrelWharehouse.release((GameObject) event.b.owner);
+            if(!inserito) {
+                gameWorld.listGameObject.remove((GameObject) event.b.owner);
+                gameWorld.listBarrel.remove((GameObject) event.b.owner);
+                gameWorld.world.destroyBody(event.b.body);
+                event.b.body.setUserData(null);
+                event.b.body.delete();
+                event.b.body = null;
+            }else{
+                gameWorld.listBarrel.remove((GameObject) event.b.owner);
+                ((PhysicsComponent)event.b.owner.components.get(ComponentType.Physics.hashCode()).get(0)).body.setTransform(15f,0,0);
+            }
             if(gameWorld.listBarrel.size() == 0){
                 gameWorld.verifyAction = false;
             }
         }else if(event.a.name.equals("barrel")  && event.b.name.equals("incinerator")){
-            gameWorld.listGameObject.remove((GameObject) event.a.owner);
-            gameWorld.listBarrel.remove((GameObject) event.a.owner);
-            gameWorld.world.destroyBody(event.a.body);
-            event.a.body.setUserData(null);
-            event.a.body.delete();
-            event.a.body = null;
+            inserito=gameWorld.listBarrelWharehouse.release((GameObject) event.a.owner);
+            if(!inserito) {
+                gameWorld.listGameObject.remove((GameObject) event.a.owner);
+                gameWorld.listBarrel.remove((GameObject) event.a.owner);
+                gameWorld.world.destroyBody(event.a.body);
+                event.a.body.setUserData(null);
+                event.a.body.delete();
+                event.a.body = null;
+            }
+            else{
+                gameWorld.listBarrel.remove((GameObject) event.a.owner);
+                ((PhysicsComponent)event.a.owner.components.get(ComponentType.Physics.hashCode()).get(0)).body.setTransform(15f,0,0);
+            }
             if(gameWorld.listBarrel.size() == 0){
                 gameWorld.verifyAction = false;
             }
